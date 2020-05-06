@@ -1,4 +1,5 @@
 # Automatically sync liked videos from youtube to a spotify playlist
+# Inspiration credit to https://github.com/TheComeUpCode
 
 import json
 import requests
@@ -9,10 +10,12 @@ import googleapiclient.discovery
 import googleapiclient.errors
 import youtube_dl
 
+from exceptions import ResponseException
+from spotify_info import spotify_username, spotify_token
+
 class SyncVideos:
 
     def __init__(self):
-        self.user_id = 1237223200
         self.youtube_client = self.get_yt_client()
         self.all_video_info = {};
 
@@ -34,11 +37,14 @@ class SyncVideos:
         flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
             client_secrets_file, scopes)
         credentials = flow.run_console()
+
+        # Get the client
         youtube = googleapiclient.discovery.build(
             api_service_name, api_version, credentials=credentials)
 
         return youtube;
     
+    # Get the liked videos from YouTube client
     def get_liked_videos(self):
         request = self.youtube_client.videos().list(
             part="snippet,contentDetails,statistics",
@@ -72,13 +78,13 @@ class SyncVideos:
             "public" : True
         })
 
-        query = "https://api.spotify.com/v1/users/{}/playlists".format(self.user_id)
+        query = "https://api.spotify.com/v1/users/{}/playlists".format(spotify_username)
         response = requests.post(
             query,
             data=request_body,
             headers={
                 "Content-Type":"application/json",
-                "Authorization": "Bearer {}".format()
+                "Authorization": "Bearer {}".format(spotify_token)
             }
         )
         response_json = response.json();
@@ -87,18 +93,21 @@ class SyncVideos:
     
     def get_spotify_uri(self, track):
         
-        query = "https://api.spotify.com/v1/search?q={}&type=track%2Cartist&limit=10&offset=5".format(track);
+        query = "https://api.spotify.com/v1/search?q={}&type=track%2Cartist&limit=10&offset=5".format(
+            track
+        )
 
         response = requests.get(
             query,
             headers={
                 "Content-Type":"application/json",
-                "Authorization": "Bearer {}".format()
+                "Authorization": "Bearer {}".format(spotify_token)
             }
         )
         response_json = response.json();
         songs = response_json["tracks"]["items"]
 
+        # Get the first result (should be correct one)
         uri = songs[0]["uri"]
 
     def add_song_to_playlist(self):
@@ -123,9 +132,17 @@ class SyncVideos:
             data = request_data,
             headers={
                 "Content-Type":"application/json",
-                "Authorization": "Bearer {}".format()
+                "Authorization": "Bearer {}".format(spotify_token)
             }
         )
 
+        # Check for valid response
+        if response.status_code != 200:
+            raise ResponseException(response.status_code)
+
         response_json = response.json()
         return response_json
+
+if __name__ == '__main__':
+    cp = SyncVideos()
+    cp.add_song_to_playlist

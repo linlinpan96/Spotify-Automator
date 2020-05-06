@@ -1,0 +1,2 @@
+spotify_username = "aznmango8@gmail.com"
+spotify_token = "BQAnm7zGgy59ezcw_gCBr1G83FvCoAoqHdvWGMEoeSYoKrFn6h05Fjo2QpMSra4PRTjjJ71Zx-ZP6MqwYYQeZMra9vWpkKfOZL5tGeIUmlY32pmIhiaIRzo2DEppdu6eNPbnpWcf8dmm12s0MktSO72trrU87v0c8kT1XahaYCqSHZw"
