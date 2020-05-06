@@ -1,4 +1,8 @@
 # Spotify-Automator
-Syncs liked Youtube videos to Spotify account.
+Syncs liked Youtube videos to a new Spotify Playlist
 
-In progress.
+## Motivation
+Practice with production APIs and python script writing.
+
+## Credentials
+Inspiration and creds go to https://github.com/TheComeUpCode. Check out her stuff there!
